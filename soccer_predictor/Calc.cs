@@ -17,5 +17,10 @@ namespace soccer_predictor
             }
             return result;
         }
+
+        public static int Superpower(int x, int y)
+        {
+            return Power(x, y) + Power(y, x);
+        }
     }
 }
