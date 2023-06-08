@@ -8,9 +8,14 @@ namespace soccer_predictor
 {
     internal class Calc
     {
-        public static int Square(int x)
+        public static int Power(int baseVal, int expVal)
         {
-            return x * x;
+            int result = 1;
+            for( int i = 0; i < expVal; i++ ) 
+            {
+                result *= baseVal;
+            }
+            return result;
         }
     }
 }
