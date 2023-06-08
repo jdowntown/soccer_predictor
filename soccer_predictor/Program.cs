@@ -1,5 +1,7 @@
-﻿Console.Write("Enter Number:");
+﻿using soccer_predictor;
+
+Console.Write("Enter Number:");
 string input = Console.ReadLine();
 int val = int.Parse(input);
-int doubleVal = val * 2;
-Console.WriteLine("2 times your number is: " + doubleVal);
+int squared = Calc.Square(val);
+Console.WriteLine("Result: " + squared);
