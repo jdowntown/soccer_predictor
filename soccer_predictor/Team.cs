@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace soccer_predictor
 {
-    internal class Team
+    internal class Team : IComparable<Team>
     {
         public string Name;
         public int Wins;
@@ -16,6 +16,11 @@ namespace soccer_predictor
         public Team(string name) 
         {
             Name = name;
+        }
+
+        public int CompareTo(Team other) 
+        {
+            return string.Compare(this.Name, other.Name); ;
         }
     }
 }

@@ -60,6 +60,8 @@ namespace soccer_predictor
                 }
             }
 
+            mTeams.Sort();
+
             for(int i = 0; i < mTeams.Count; i++) 
             {
                 Console.WriteLine(string.Format("{0} {1}W-{2}L-{3}T", mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties));
