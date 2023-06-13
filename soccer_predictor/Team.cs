@@ -27,7 +27,12 @@ namespace soccer_predictor
 
         public int CompareTo(Team other) 
         {
-            return string.Compare(this.Name, other.Name); ;
+            if(this.WinPercent() > other.WinPercent())
+            {
+                return -1;
+            }
+            
+            return 1;
         }
     }
 }
