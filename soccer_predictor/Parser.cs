@@ -10,6 +10,8 @@ namespace soccer_predictor
     internal class Parser
     {
         public List<Match> mMatches = new List<Match>();
+        public List<Team> mTeams = new List<Team>();
+
         public void Parse()
         {
             string contents = File.ReadAllText("..\\..\\..\\results.csv");
@@ -25,23 +27,43 @@ namespace soccer_predictor
                 mMatches.Add(new Match(lines[i]));
             }
 
-            int maxHomeScore = 0;
             for( int i = 0; i < mMatches.Count; i++) 
             {
-                if (mMatches[i].HomeScore > maxHomeScore) 
+                Team? homeTeam = mTeams.Find(x => x.Name == mMatches[i].HomeTeam);
+                if(homeTeam == null) 
                 {
-                    maxHomeScore = mMatches[i].HomeScore;
+                    homeTeam = new Team(mMatches[i].HomeTeam);
+                    mTeams.Add(homeTeam);
+                }
+
+                Team? awayTeam = mTeams.Find(x => x.Name == mMatches[i].AwayTeam);
+                if (awayTeam == null)
+                {
+                    awayTeam = new Team(mMatches[i].AwayTeam);
+                    mTeams.Add(awayTeam);
+                }
+
+                if (mMatches[i].HomeScore == mMatches[i].AwayScore) 
+                {
+                    homeTeam.Ties++;
+                    awayTeam.Ties++;
+                }
+                else if (mMatches[i].HomeScore > mMatches[i].AwayScore) 
+                {
+                    homeTeam.Wins++;
+                    awayTeam.Losses++;
+                }
+                else
+                {
+                    homeTeam.Losses++;
+                    awayTeam.Wins++;
                 }
             }
 
-            for (int i = 0; i < mMatches.Count; i++)
+            for(int i = 0; i < mTeams.Count; i++) 
             {
-                if (mMatches[i].HomeScore == maxHomeScore)
-                {
-                    Console.WriteLine(mMatches[i].Raw);
-                }
+                Console.WriteLine(string.Format("{0} {1}W-{2}L-{3}T", mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties));
             }
-
         }
     }
 }
