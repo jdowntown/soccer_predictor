@@ -11,7 +11,11 @@ namespace soccer_predictor
         public void Parse()
         {
             string contents = File.ReadAllText("..\\..\\..\\results.csv");
-            Console.WriteLine(contents);
+            string[] lines = contents.Split('\n');
+            for(int i = 0; i < lines.Length; i++)
+            {
+                Console.WriteLine(string.Format("{0}.{1}", i + 1, lines[i]));
+            }
         }
     }
 }
