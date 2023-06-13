@@ -8,12 +8,15 @@ namespace soccer_predictor
 {
     internal class Match
     {
+        public string Raw;
         public string HomeTeam;
         public string AwayTeam;
         public int HomeScore;
         public int AwayScore;
+        
         public Match(string input)
         {
+            Raw = input;
             string[] fields = input.Split(',');
             HomeTeam = fields[1];
             AwayTeam = fields[2];
