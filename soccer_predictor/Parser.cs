@@ -12,9 +12,14 @@ namespace soccer_predictor
         {
             string contents = File.ReadAllText("..\\..\\..\\results.csv");
             string[] lines = contents.Split('\n');
-            for(int i = 0; i < lines.Length; i++)
+            for(int i = 1; i < lines.Length; i++)
             {
-                Console.WriteLine(string.Format("{0}.{1}", i + 1, lines[i]));
+                if (lines[i].Length < 5)
+                {
+                    continue;
+                }
+                Match match = new Match(lines[i]);
+                Console.WriteLine(string.Format("{0} {1} - {2} {3}", match.HomeTeam, match.HomeScore, match.AwayTeam, match.AwayScore));
             }
         }
     }
