@@ -62,9 +62,15 @@ namespace soccer_predictor
 
             mTeams.Sort();
 
-            for(int i = 0; i < mTeams.Count; i++) 
+            int counter = 1;
+            for (int i = 0; i < mTeams.Count; i++)
             {
-                Console.WriteLine(string.Format("{5}: {0} {1}W-{2}L-{3}T %:{4}", mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties, mTeams[i].WinPercent(), i+1));
+                if (mTeams[i].Wins + mTeams[i].Losses + mTeams[i].Ties < 50)
+                {
+                    continue;
+                }
+                Console.WriteLine(string.Format("{5}: {0} {1}W-{2}L-{3}T %:{4}", mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties, mTeams[i].WinPercent(), counter));
+                counter++;
             }
         }
     }
