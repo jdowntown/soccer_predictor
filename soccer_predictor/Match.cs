@@ -14,6 +14,7 @@ namespace soccer_predictor
         public int HomeScore;
         public int AwayScore;
         public string Event;
+        public bool IsNeutral;
         
         public Match(string input)
         {
@@ -24,6 +25,7 @@ namespace soccer_predictor
             HomeScore = int.Parse(fields[3]);
             AwayScore = int.Parse(fields[4]);
             Event = fields[5];
+            IsNeutral = bool.Parse(fields[8]);
         }
     }
 }

@@ -8,13 +8,13 @@ namespace soccer_predictor
 {
     class Algorithms
     {
-        public static int Alphabetical(Team a, Team b)
+        public static int Alphabetical(Team home, Team away, bool isNeutral)
         {
-            if (a.Name[0] == b.Name[0])
+            if (home.Name[0] == away.Name[0])
             {
                 return 0;
             }
-            else if (a.Name[0] < b.Name[0])
+            else if (home.Name[0] < away.Name[0])
             {
                 return 1;
             }
@@ -24,11 +24,32 @@ namespace soccer_predictor
             }
         }
 
-        public static int WinRating(Team a, Team b)
+        public static int WinRating(Team home, Team away, bool isNeutral)
         {
-            return a.WinRating.CompareTo(b.WinRating);
+            return home.WinRating.CompareTo(away.WinRating);
         }
 
+        public static int EloRating(Team home, Team away, bool isNeutral)
+        {
+            double homeRating = home.EloRating;
+            double awayRating = away.EloRating;
+            if(isNeutral == false)
+            {
+                homeRating += 100;
+            }
 
+            if(homeRating > awayRating + 50)
+            {
+                return 1;
+            }
+            else if(homeRating + 50 < awayRating)
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }

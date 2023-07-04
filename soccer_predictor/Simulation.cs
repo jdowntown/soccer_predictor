@@ -8,7 +8,7 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
-        public delegate int PredictorFunction(Team a, Team b);
+        public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
 
         public static void ProcessMatchResults(Match match, Team home, Team away)
         {
@@ -23,13 +23,36 @@ namespace soccer_predictor
                 home.WinRating--;
                 away.WinRating++;
             }
+
+            //Update elo rating
+            double rd = home.EloRating - away.EloRating;
+            if(match.IsNeutral == false)
+            {
+                rd += 100;
+            }
+            double er = 1 / (Math.Pow(10, -1 * rd / 400) + 1);
+            double ar = 0.0;
+            if(match.HomeScore > match.AwayScore)
+            {
+                ar = 1.0;
+            }
+            else if(match.HomeScore == match.AwayScore)
+            {
+                ar = 0.5;
+            }
+            double ratingsChange = 40 * (ar - er);
+            home.EloRating += ratingsChange;
+            away.EloRating -= ratingsChange;
         }
+
+        public static List<Team>? teams;
 
         public static double Run(List <Match> matches, PredictorFunction predictor)
         {
             double sum = 0.0;
             int counter = 0;
-            List<Team> teams = new List<Team>();
+
+            teams = new List<Team>();
 
             for (int i = 0; i < matches.Count; i++)
             {
@@ -51,7 +74,7 @@ namespace soccer_predictor
                 //Run prediction if it is a world cup match
                 if (matches[i].Event == "FIFA World Cup")
                 {
-                    int prediction = predictor(homeTeam, awayTeam);
+                    int prediction = predictor(homeTeam, awayTeam, matches[i].IsNeutral);
                     double score = 0;
                     string predictionText = "";
 
