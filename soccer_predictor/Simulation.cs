@@ -158,6 +158,7 @@ namespace soccer_predictor
             }
 
             double ratingsChange = mi * (ar - er) * af;
+            match.EloChange = Math.Abs(ratingsChange);
             home.EloRating += ratingsChange;
             away.EloRating -= ratingsChange;
         }

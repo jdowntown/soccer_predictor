@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace soccer_predictor
 {
-    internal class Match
+    internal class Match : IComparable<Match>
     {
         public string Raw;
         public string HomeTeam;
@@ -15,6 +15,7 @@ namespace soccer_predictor
         public int AwayScore;
         public bool IsNeutral;
         public MatchType Event;
+        public double EloChange;
 
         public enum MatchType
         {
@@ -39,6 +40,7 @@ namespace soccer_predictor
             HomeScore = int.Parse(fields[3]);
             AwayScore = int.Parse(fields[4]);
             IsNeutral = bool.Parse(fields[8]);
+            EloChange = 0;
 
             string ev = fields[5];
             if(ev == "FIFA World Cup")
@@ -94,6 +96,11 @@ namespace soccer_predictor
                 }*/
                 Event = MatchType.Other;
             }
+        }
+
+        public int CompareTo(Match other)
+        {
+            return -1 * EloChange.CompareTo(other.EloChange);
         }
     }
 }
