@@ -40,7 +40,32 @@ namespace soccer_predictor
             {
                 ar = 0.5;
             }
-            double ratingsChange = 40 * (ar - er);
+            double mov = Math.Abs(match.HomeScore - match.AwayScore);
+            double af = 1.0;
+            if(mov == 2)
+            {
+                af = 1.5;
+            }
+            else if(mov == 3)
+            {
+                af = 1.75;
+            }
+            else if(mov > 3)
+            {
+                af = 1.9;
+            }
+
+            double mi = 40;
+            if (match.Event == "FIFA World Cup")
+            {
+                mi = 60;
+            }
+            else if (match.Event == "Friendly")
+            {
+                mi = 20;
+            }
+
+            double ratingsChange = mi * (ar - er) * af;
             home.EloRating += ratingsChange;
             away.EloRating -= ratingsChange;
         }
