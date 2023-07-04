@@ -35,14 +35,14 @@ namespace soccer_predictor
             double awayRating = away.EloRating;
             if(isNeutral == false)
             {
-                homeRating += 100;
+                homeRating += Simulation.HOME_ADV;
             }
 
-            if(homeRating > awayRating + 50)
+            if(homeRating > awayRating + Simulation.DRAW_DIST)
             {
                 return 1;
             }
-            else if(homeRating + 50 < awayRating)
+            else if(homeRating + Simulation.DRAW_DIST < awayRating)
             {
                 return -1;
             }

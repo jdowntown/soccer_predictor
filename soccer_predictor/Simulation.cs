@@ -8,6 +8,13 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
+        public static double HOME_ADV = 100.0;
+        public static double DRAW_DIST = 21.0;
+        public static double MOV_FACTOR = 1.7;
+        public static double MOV_LIMIT = 1.4;
+        public static double IMP_FACTOR = 1.2;
+        public static double RECENCY = 40.0;
+
         public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
 
         public static void ProcessMatchResults(Match match, Team home, Team away)
@@ -28,7 +35,7 @@ namespace soccer_predictor
             double rd = home.EloRating - away.EloRating;
             if(match.IsNeutral == false)
             {
-                rd += 100;
+                rd += HOME_ADV;
             }
             double er = 1 / (Math.Pow(10, -1 * rd / 400) + 1);
             double ar = 0.0;
@@ -44,25 +51,25 @@ namespace soccer_predictor
             double af = 1.0;
             if(mov == 2)
             {
-                af = 1.5;
+                af += MOV_FACTOR;
             }
             else if(mov == 3)
             {
-                af = 1.75;
+                af += MOV_FACTOR + MOV_FACTOR * MOV_LIMIT;
             }
             else if(mov > 3)
             {
-                af = 1.9;
+                af = MOV_FACTOR + MOV_FACTOR * MOV_LIMIT + MOV_FACTOR * MOV_LIMIT * MOV_LIMIT;
             }
 
-            double mi = 40;
+            double mi = RECENCY;
             if (match.Event == "FIFA World Cup")
             {
-                mi = 60;
+                mi *= IMP_FACTOR;
             }
             else if (match.Event == "Friendly")
             {
-                mi = 20;
+                mi /= IMP_FACTOR;
             }
 
             double ratingsChange = mi * (ar - er) * af;
