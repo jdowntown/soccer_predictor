@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,18 +10,21 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
-        public static double HOME_ADV = 101.2;
-        public static double DRAW_DIST = 24.4;
-        public static double MOV_FACTOR = 1.72;
-        public static double MOV_LIMIT = 1.3;
-        public static double RECENCY = 42.4;
-        public static double K_WC = 1.04;
-        public static double K_WCQ = 0.96;
-        public static double K_CC = 1.08;
-        public static double K_CCQ = 0.66;
-        public static double K_CFC = 0.88;
-        public static double K_OT = 0.96;
-        public static double K_F = 0.98;
+        public static double HOME_ADV = 100;
+        public static double DRAW_DIST = 30;
+        public static double MOV_2 = 0.5;
+        public static double MOV_3 = 0.75;
+        public static double MOV_4 = 0.875;
+        public static double MOV_5 = 1;
+        public static double RECENCY = 40;
+        public static double K_WC = 1.5;
+        public static double K_CC = 1.25;
+        public static double K_CFC = 1.25;
+        public static double K_WCQ = 1.0;
+        public static double K_CCQ = 1.0;
+        public static double K_NL = 1.0;
+        public static double K_OT = 0.75;
+        public static double K_F = 0.50;
 
         public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
 
@@ -31,13 +35,16 @@ namespace soccer_predictor
             for (double val = min; val <= max; val += step)
             {
                 param = val;
-                double score = Simulation.Run(matches, Algorithms.EloRating);
+                double[] result = Simulation.Run(matches, Algorithms.EloRating);
+                double score = result[0] + result[1] + result[2];
                 if (score > bestScore)
                 {
                     bestScore = score;
                     bestVal = val;
                 }
                 //Console.WriteLine(name + ": " + val + " Score:" + score);
+                Console.WriteLine(name + ": " + val + " WC: " + result[0] + "   CC:" + result[1] + "   All:" + result[2]);
+
             }
             Console.WriteLine("Best " + name + ": "  + bestVal + " Score:" + bestScore);
             param = bestVal;
@@ -77,15 +84,19 @@ namespace soccer_predictor
             double af = 1.0;
             if(mov == 2)
             {
-                af += MOV_FACTOR;
+                af += MOV_2;
             }
             else if(mov == 3)
             {
-                af += MOV_FACTOR + MOV_FACTOR * MOV_LIMIT;
+                af += MOV_3;
             }
-            else if(mov > 3)
+            else if(mov == 4)
             {
-                af = MOV_FACTOR + MOV_FACTOR * MOV_LIMIT + MOV_FACTOR * MOV_LIMIT * MOV_LIMIT;
+                af += MOV_4;
+            }
+            else if (mov > 4)
+            {
+                af += MOV_5;
             }
 
             double mi = RECENCY;
@@ -103,6 +114,8 @@ namespace soccer_predictor
                     mi *= K_CFC; break;
                 case Match.MatchType.Friendly:
                     mi *= K_F; break;
+                case Match.MatchType.NationsLeague:
+                    mi *= K_NL; break;
                 case Match.MatchType.Other:
                     mi *= K_OT; break;
             }
@@ -114,15 +127,14 @@ namespace soccer_predictor
 
         public static List<Team>? teams;
 
-        public static double Run(List <Match> matches, PredictorFunction predictor)
+        public static double[] Run(List <Match> matches, PredictorFunction predictor)
         {
-            double sum = 0.0;
-            int counter = 0;
-            int correctWin = 0;
-            int correctDraw = 0;
-            int winsCalledDraws = 0;
-            int drawsCalledWins = 0;
-            int lossesCalledWins = 0;
+            double WCsum = 0.0;
+            int WCcounter = 0;
+            double CCsum = 0.0;
+            int CCcounter = 0;
+            double Allsum = 0.0;
+            int Allcounter = 0;
 
             teams = new List<Team>();
 
@@ -143,9 +155,6 @@ namespace soccer_predictor
                     teams.Add(awayTeam);
                 }
 
-                //Run prediction if it is a world cup match
-                if (matches[i].Event == Match.MatchType.WorldCup)
-                {
                     int prediction = predictor(homeTeam, awayTeam, matches[i].IsNeutral);
                     double score = 0;
                     string predictionText = "";
@@ -157,12 +166,10 @@ namespace soccer_predictor
                         if (matches[i].HomeScore == matches[i].AwayScore)
                         {
                             score = 1.0;
-                            correctDraw++;
                         }
                         else
                         {
                             score = 0.3;
-                            winsCalledDraws++;
                         }
                     }
                     else if (prediction > 0)
@@ -171,17 +178,14 @@ namespace soccer_predictor
                         if (matches[i].HomeScore > matches[i].AwayScore)
                         {
                             score = 1.0;
-                            correctWin++;
                         }
                         else if (matches[i].HomeScore == matches[i].AwayScore)
                         {
                             score = 0.3;
-                            drawsCalledWins++;
                         }
                         else
                         {
                             score = 0;
-                            lossesCalledWins++;
                         }
                     }
                     else
@@ -190,35 +194,41 @@ namespace soccer_predictor
                         if (matches[i].HomeScore < matches[i].AwayScore)
                         {
                             score = 1.0;
-                            correctWin++;
                         }
                         else if (matches[i].HomeScore == matches[i].AwayScore)
                         {
                             score = 0.3;
-                            drawsCalledWins++;
                         }
                         else
                         {
                             score = 0;
-                            lossesCalledWins++;
                         }
                     }
-                    //Console.WriteLine(string.Format("{0} - {1} - {2} - {3} {4}", score, prediction, matches[i].Raw, homeTeam.EloRating, awayTeam.EloRating));
-                    sum += score;
-                    counter++;
+                //Console.WriteLine(string.Format("{0} - {1} - {2} - {3} {4}", score, prediction, matches[i].Raw, homeTeam.EloRating, awayTeam.EloRating));
+
+                if (matches[i].Event == Match.MatchType.WorldCup)
+                {
+                    WCsum += score;
+                    WCcounter++;
                 }
+                if (matches[i].Event == Match.MatchType.WorldCup || matches[i].Event == Match.MatchType.ContCup)
+                {
+                    CCsum += score;
+                    CCcounter++;
+                }
+                Allsum += score;
+                Allcounter++;
+
 
                 ProcessMatchResults(matches[i], homeTeam, awayTeam);
             }
 
-            /*Console.WriteLine(string.Format("Total Matches: {0}", counter));
-            Console.WriteLine(string.Format("Correctly Predicted Win: {0}", correctWin));
-            Console.WriteLine(string.Format("Correctly Predicted Draw: {0}", correctDraw));
-            Console.WriteLine(string.Format("Predicted Draw Actual Win: {0}", winsCalledDraws));
-            Console.WriteLine(string.Format("Predicted Win Actual Draw: {0}", drawsCalledWins));
-            Console.WriteLine(string.Format("Predicted Win Actual Loss: {0}", lossesCalledWins));
-            */
-            return sum / counter;
+            double[] result = new double[3];
+            result[0] = WCsum / WCcounter;
+            result[1] = CCsum / CCcounter;
+            result[2] = Allsum / Allcounter;
+
+            return result;
         }
     }
 }

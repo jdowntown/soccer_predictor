@@ -23,6 +23,7 @@ namespace soccer_predictor
             ContCup,
             ContCupQual,
             ConfedCup,
+            NationsLeague,
             Other,
             Friendly
         }
@@ -77,7 +78,7 @@ namespace soccer_predictor
                 ev == "CONCACAF Nations League qualification" ||
                 ev == "African Nations Championship")
             {
-                Event = MatchType.ContCupQual;
+                Event = MatchType.NationsLeague;
             }
             else if (ev == "Confederations Cup")
             {

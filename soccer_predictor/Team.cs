@@ -21,7 +21,7 @@ namespace soccer_predictor
 
         public int CompareTo(Team other)
         {
-            return EloRating.CompareTo(other.EloRating);
+            return -1 * EloRating.CompareTo(other.EloRating);
         }
     }
 }
