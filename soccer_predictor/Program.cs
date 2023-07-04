@@ -7,21 +7,59 @@ List<Match> matches = parser.mMatches;
 
 for(int i = 0; i < matches.Count; i++)
 {
+    double score = 0;
+    string prediction = "";
     if (matches[i].Event == "FIFA World Cup")
     {
         if (matches[i].HomeTeam[0] == matches[i].AwayTeam[0])
         {
-            Console.WriteLine("Draw - " + matches[i].Raw);
+            prediction = "Draw";
+
+            if(matches[i].HomeScore == matches[i].AwayScore)
+            {
+                score = 1.0;
+            }
+            else
+            {
+                score = 0.3;
+            }
         }
         else if(matches[i].HomeTeam[0] < matches[i].AwayTeam[0])
         {
-            Console.WriteLine(matches[i].HomeTeam + " wins - " + matches[i].Raw);
+            prediction = matches[i].HomeTeam + " wins";
+            if (matches[i].HomeScore > matches[i].AwayScore)
+            {
+                score = 1.0;
+            }
+            else if (matches[i].HomeScore == matches[i].AwayScore)
+            {
+                score = 0.3;
+            }
+            else
+            {
+                score = 0;
+            }
         }
         else
         {
-            Console.WriteLine(matches[i].AwayTeam + " wins - " + matches[i].Raw);
+            prediction = matches[i].AwayTeam + " wins";
+            if (matches[i].HomeScore < matches[i].AwayScore)
+            {
+                score = 1.0;
+            }
+            else if (matches[i].HomeScore == matches[i].AwayScore)
+            {
+                score = 0.3;
+            }
+            else
+            {
+                score = 0;
+            }
         }
+        Console.WriteLine(string.Format("{0} - {1} - {2}", score, prediction, matches[i].Raw));
     }
+
+    
 }
 
 
