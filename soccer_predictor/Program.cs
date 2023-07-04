@@ -6,5 +6,7 @@ parser.Parse();
 List<Match> matches = parser.mMatches;
 
 double average = Simulation.Run(matches, Algorithms.Alphabetical);
+Console.WriteLine("Alphabetical: " + average);
 
-Console.WriteLine("Match average: " + average);
+average = Simulation.Run(matches, Algorithms.WinRating);
+Console.WriteLine("WinRating: " + average);

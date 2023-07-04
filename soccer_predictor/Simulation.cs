@@ -12,7 +12,17 @@ namespace soccer_predictor
 
         public static void ProcessMatchResults(Match match, Team home, Team away)
         {
-            //TODO update values
+            //Update win rating
+            if(match.HomeScore > match.AwayScore)
+            {
+                home.WinRating++;
+                away.WinRating--;
+            }
+            else if (match.HomeScore < match.AwayScore)
+            {
+                home.WinRating--;
+                away.WinRating++;
+            }
         }
 
         public static double Run(List <Match> matches, PredictorFunction predictor)
@@ -90,7 +100,7 @@ namespace soccer_predictor
                             score = 0;
                         }
                     }
-                    //Console.WriteLine(string.Format("{0} - {1} - {2}", score, prediction, matches[i].Raw));
+                    //Console.WriteLine(string.Format("{0} - {1} - {2} - {3} {4}", score, prediction, matches[i].Raw, homeTeam.WinRating, awayTeam.WinRating));
                     sum += score;
                     counter++;
                 }

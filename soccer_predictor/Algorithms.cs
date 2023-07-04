@@ -24,7 +24,10 @@ namespace soccer_predictor
             }
         }
 
-
+        public static int WinRating(Team a, Team b)
+        {
+            return a.WinRating.CompareTo(b.WinRating);
+        }
 
 
     }

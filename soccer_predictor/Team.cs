@@ -9,12 +9,12 @@ namespace soccer_predictor
     internal class Team
     {
         public string Name;
-        public double Rating;
+        public double WinRating;
 
         public Team(string name) 
         {
             Name = name;
-            Rating = 1000;
+            WinRating = 1000;
         }
     }
 }
