@@ -64,19 +64,17 @@ namespace soccer_predictor
                 awayTeam.GoalsFor += mMatches[i].AwayScore;
                 awayTeam.GoalsAgainst += mMatches[i].HomeScore;
             }
-
-            mTeams.Sort();
-
-            int counter = 1;
-            for (int i = 0; i < mTeams.Count; i++)
+            int counter = 0;
+            for (int i = 0; i < mMatches.Count; i++)
             {
-                if (mTeams[i].Wins + mTeams[i].Losses + mTeams[i].Ties < 50)
+                if (mMatches[i].Event == "FIFA World Cup")
                 {
-                    continue;
+                    Console.WriteLine(mMatches[i].Raw);
+                    counter++;
                 }
-                Console.WriteLine(string.Format("{0}: {1} {2}W-{3}L-{4}T GF:{5} GA:{6} GD:{7}", counter, mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties,mTeams[i].GoalsFor, mTeams[i].GoalsAgainst, mTeams[i].GoalsFor-mTeams[i].GoalsAgainst));
-                counter++;
             }
+
+            Console.WriteLine("Total WC Matches:" + counter);
         }
     }
 }
