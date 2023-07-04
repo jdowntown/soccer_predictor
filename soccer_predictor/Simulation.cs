@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace soccer_predictor
 {
@@ -102,6 +103,11 @@ namespace soccer_predictor
         {
             double sum = 0.0;
             int counter = 0;
+            int correctWin = 0;
+            int correctDraw = 0;
+            int winsCalledDraws = 0;
+            int drawsCalledWins = 0;
+            int lossesCalledWins = 0;
 
             teams = new List<Team>();
 
@@ -136,10 +142,12 @@ namespace soccer_predictor
                         if (matches[i].HomeScore == matches[i].AwayScore)
                         {
                             score = 1.0;
+                            correctDraw++;
                         }
                         else
                         {
                             score = 0.3;
+                            winsCalledDraws++;
                         }
                     }
                     else if (prediction > 0)
@@ -148,14 +156,17 @@ namespace soccer_predictor
                         if (matches[i].HomeScore > matches[i].AwayScore)
                         {
                             score = 1.0;
+                            correctWin++;
                         }
                         else if (matches[i].HomeScore == matches[i].AwayScore)
                         {
                             score = 0.3;
+                            drawsCalledWins++;
                         }
                         else
                         {
                             score = 0;
+                            lossesCalledWins++;
                         }
                     }
                     else
@@ -164,23 +175,34 @@ namespace soccer_predictor
                         if (matches[i].HomeScore < matches[i].AwayScore)
                         {
                             score = 1.0;
+                            correctWin++;
                         }
                         else if (matches[i].HomeScore == matches[i].AwayScore)
                         {
                             score = 0.3;
+                            drawsCalledWins++;
                         }
                         else
                         {
                             score = 0;
+                            lossesCalledWins++;
                         }
                     }
-                    //Console.WriteLine(string.Format("{0} - {1} - {2} - {3} {4}", score, prediction, matches[i].Raw, homeTeam.WinRating, awayTeam.WinRating));
+                    //Console.WriteLine(string.Format("{0} - {1} - {2} - {3} {4}", score, prediction, matches[i].Raw, homeTeam.EloRating, awayTeam.EloRating));
                     sum += score;
                     counter++;
                 }
 
                 ProcessMatchResults(matches[i], homeTeam, awayTeam);
             }
+
+            Console.WriteLine(string.Format("Total Matches: {0}", counter));
+            Console.WriteLine(string.Format("Correctly Predicted Win: {0}", correctWin));
+            Console.WriteLine(string.Format("Correctly Predicted Draw: {0}", correctDraw));
+            Console.WriteLine(string.Format("Predicted Draw Actual Win: {0}", winsCalledDraws));
+            Console.WriteLine(string.Format("Predicted Win Actual Draw: {0}", drawsCalledWins));
+            Console.WriteLine(string.Format("Predicted Win Actual Loss: {0}", lossesCalledWins));
+
             return sum / counter;
         }
     }
