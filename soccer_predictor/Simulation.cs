@@ -8,14 +8,33 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
-        public static double HOME_ADV = 100.0;
-        public static double DRAW_DIST = 21.0;
+        public static double HOME_ADV = 111.2;
+        public static double DRAW_DIST = 24.4;
         public static double MOV_FACTOR = 1.7;
-        public static double MOV_LIMIT = 1.4;
+        public static double MOV_LIMIT = 1.3;
         public static double IMP_FACTOR = 1.2;
-        public static double RECENCY = 40.0;
+        public static double RECENCY = 42.2;
 
         public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
+
+        public static void TestParam(string name, ref double param, double min, double max, double step, List<Match> matches)
+        {
+            double bestScore = 0.0;
+            double bestVal = min;
+            for (double val = min; val <= max; val += step)
+            {
+                param = val;
+                double score = Simulation.Run(matches, Algorithms.EloRating);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestVal = val;
+                }
+                //Console.WriteLine(name + ": " + val + " Score:" + score);
+            }
+            Console.WriteLine("Best " + name + ": "  + bestVal + " Score:" + bestScore);
+            param = bestVal;
+        }
 
         public static void ProcessMatchResults(Match match, Team home, Team away)
         {

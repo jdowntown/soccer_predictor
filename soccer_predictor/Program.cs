@@ -14,54 +14,12 @@ Console.WriteLine("WinRating: " + average);
 average = Simulation.Run(matches, Algorithms.EloRating);
 Console.WriteLine("EloRating: " + average);*/
 
-//This simulates the possible home advantage values
-/*for (double val = 0; val < 200; val += 1.0)
-{
-    Simulation.HOME_ADV = val;
-    double score = Simulation.Run(matches, Algorithms.EloRating);
-    Console.WriteLine("Home Adv: " + val + " Score:" + score);
-}*/
-
-//This simulates the possible drawing distance values
-/*for (double val = 0; val < 200; val += 1.0)
-{
-    Simulation.DRAW_DIST = val;
-    double score = Simulation.Run(matches, Algorithms.EloRating);
-    Console.WriteLine("Draw Dist: " + val + " Score:" + score);
-}*/
-
-//This simulates the margin of victory values
-/*for (double val = 0; val <= 3.0; val += 0.1)
-{
-    Simulation.MOV_FACTOR = val;
-    double score = Simulation.Run(matches, Algorithms.EloRating);
-    Console.WriteLine("MOV factor: " + val + " Score:" + score);
-}*/
-
-//This simulates the margin of victory limit
-/*for (double val = 0; val <= 3.0; val += 0.1)
-{
-    Simulation.MOV_LIMIT = val;
-    double score = Simulation.Run(matches, Algorithms.EloRating);
-    Console.WriteLine("MOV limit: " + val + " Score:" + score);
-}*/
-
-//This simulates the importance factor limit
-/*for (double val = 1.0; val <= 3.0; val += 0.1)
-{
-    Simulation.IMP_FACTOR = val;
-    double score = Simulation.Run(matches, Algorithms.EloRating);
-    Console.WriteLine("Imp factor: " + val + " Score:" + score);
-}*/
-
-//This simulates the recency
-/*for (double val = 1.0; val <= 100.0; val += 1.0)
-{
-    Simulation.RECENCY = val;
-    double score = Simulation.Run(matches, Algorithms.EloRating);
-    Console.WriteLine("Recency: " + val + " Score:" + score);
-}*/
-
+Simulation.TestParam("HOME_ADV", ref Simulation.HOME_ADV, 50, 150, 0.2, matches);
+Simulation.TestParam("DRAW_DIST", ref Simulation.DRAW_DIST, 10, 30, 0.2, matches);
+Simulation.TestParam("MOV_FACTOR", ref Simulation.MOV_FACTOR, 0.5, 2.5, 0.02, matches);
+Simulation.TestParam("MOV_LIMIT", ref Simulation.MOV_LIMIT, 0.5, 2.5, 0.02, matches);
+Simulation.TestParam("IMP_FACTOR", ref Simulation.IMP_FACTOR, 0.5, 2.5, 0.02, matches);
+Simulation.TestParam("RECENCY", ref Simulation.RECENCY, 30, 60, 0.2, matches);
 
 /*Simulation.teams.Sort();
 
