@@ -58,6 +58,11 @@ namespace soccer_predictor
                     homeTeam.Losses++;
                     awayTeam.Wins++;
                 }
+
+                homeTeam.GoalsFor += mMatches[i].HomeScore;
+                homeTeam.GoalsAgainst += mMatches[i].AwayScore;
+                awayTeam.GoalsFor += mMatches[i].AwayScore;
+                awayTeam.GoalsAgainst += mMatches[i].HomeScore;
             }
 
             mTeams.Sort();
@@ -69,7 +74,7 @@ namespace soccer_predictor
                 {
                     continue;
                 }
-                Console.WriteLine(string.Format("{5}: {0} {1}W-{2}L-{3}T %:{4}", mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties, mTeams[i].WinPercent(), counter));
+                Console.WriteLine(string.Format("{0}: {1} {2}W-{3}L-{4}T GF:{5} GA:{6} GD:{7}", counter, mTeams[i].Name, mTeams[i].Wins, mTeams[i].Losses, mTeams[i].Ties,mTeams[i].GoalsFor, mTeams[i].GoalsAgainst, mTeams[i].GoalsFor-mTeams[i].GoalsAgainst));
                 counter++;
             }
         }

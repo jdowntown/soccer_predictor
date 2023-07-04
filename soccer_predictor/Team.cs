@@ -12,6 +12,8 @@ namespace soccer_predictor
         public int Wins;
         public int Losses;
         public int Ties;
+        public int GoalsFor;
+        public int GoalsAgainst;
 
         public Team(string name) 
         {
@@ -27,12 +29,13 @@ namespace soccer_predictor
 
         public int CompareTo(Team other) 
         {
-            if(this.WinPercent() > other.WinPercent())
-            {
-                return -1;
-            }
+            return Name.CompareTo(other.Name);
+            //if(Name > other.Name)
+            //{
+            //    return -1;
+            //}
             
-            return 1;
+            //return 1;
         }
     }
 }
