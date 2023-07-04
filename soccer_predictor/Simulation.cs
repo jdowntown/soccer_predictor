@@ -10,12 +10,14 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
+#if false
+        //Default Elo values - Default Sum: 1.9176294406632326  WC: 0.6356846473029044  CC:0.6348376880443374  All:0.6471071053159909
         public static double HOME_ADV = 100;
         public static double DRAW_DIST = 30;
         public static double MOV_2 = 0.5;
         public static double MOV_3 = 0.75;
         public static double MOV_4 = 0.875;
-        public static double MOV_5 = 1;
+        public static double MOV_5 = 1.0;
         public static double RECENCY = 40;
         public static double K_WC = 1.5;
         public static double K_CC = 1.25;
@@ -25,13 +27,48 @@ namespace soccer_predictor
         public static double K_NL = 1.0;
         public static double K_OT = 0.75;
         public static double K_F = 0.50;
-
+#elif false
+        //rough find - Default Sum: 1.9412038978616803  WC: 0.6498962655601653  CC:0.6422011084718919  All:0.6491065238296229
+        public static double HOME_ADV = 100;
+        public static double DRAW_DIST = 30;
+        public static double MOV_2 = 0.5;
+        public static double MOV_3 = 0.75;
+        public static double MOV_4 = 1.03;
+        public static double MOV_5 = 1.0;
+        public static double RECENCY = 40;
+        public static double K_WC = 1.48;
+        public static double K_CC = 1.25;
+        public static double K_CFC = 1.25;
+        public static double K_WCQ = 1.0;
+        public static double K_CCQ = 1.0;
+        public static double K_NL = 0.98;
+        public static double K_OT = 0.86;
+        public static double K_F = 0.66;
+#else
+        //Fine tuned - Default Sum: 1.9432122254865127  WC: 0.6512448132780078  CC:0.6424650303510157  All:0.6495023818574894
+        public static double HOME_ADV = 100.50;
+        public static double DRAW_DIST = 30.25;
+        public static double MOV_2 = 0.506;
+        public static double MOV_3 = 0.734;
+        public static double MOV_4 = 1.04;
+        public static double MOV_5 = 1.033;
+        public static double RECENCY = 40.06;
+        public static double K_WC = 1.444;
+        public static double K_WCQ = 0.999;
+        public static double K_CC = 1.255;
+        public static double K_CCQ = 0.996;
+        public static double K_CFC = 1.374;
+        public static double K_NL = 0.981;
+        public static double K_OT = 0.860;
+        public static double K_F = 0.661;
+#endif
         public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
 
         public static void TestParam(string name, ref double param, double min, double max, double step, List<Match> matches)
         {
             double bestScore = 0.0;
             double bestVal = min;
+            double startVal = param;
             for (double val = min; val <= max; val += step)
             {
                 param = val;
@@ -43,11 +80,11 @@ namespace soccer_predictor
                     bestVal = val;
                 }
                 //Console.WriteLine(name + ": " + val + " Score:" + score);
-                Console.WriteLine(name + ": " + val + " WC: " + result[0] + "   CC:" + result[1] + "   All:" + result[2]);
-
+                //Console.WriteLine(name + ": " + val + " Sum: " + score + " WC: " + result[0] + "   CC:" + result[1] + "   All:" + result[2]);
+                //Console.WriteLine("Score:" + score + " " + name + ": " + val);
             }
-            Console.WriteLine("Best " + name + ": "  + bestVal + " Score:" + bestScore);
-            param = bestVal;
+            Console.WriteLine("***Score:" + bestScore + " Best " + name + ": "  + bestVal);
+            param = startVal;
         }
 
         public static void ProcessMatchResults(Match match, Team home, Team away)
