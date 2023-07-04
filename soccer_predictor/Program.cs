@@ -5,6 +5,9 @@ parser.Parse();
 
 List<Match> matches = parser.mMatches;
 
+double sum = 0.0;
+int counter = 0;
+
 for(int i = 0; i < matches.Count; i++)
 {
     double score = 0;
@@ -56,13 +59,12 @@ for(int i = 0; i < matches.Count; i++)
                 score = 0;
             }
         }
-        Console.WriteLine(string.Format("{0} - {1} - {2}", score, prediction, matches[i].Raw));
+        //Console.WriteLine(string.Format("{0} - {1} - {2}", score, prediction, matches[i].Raw));
+        sum += score;
+        counter++;
     }
 
-    
 }
 
-
-
-
-
+double average = sum / counter;
+Console.WriteLine("Match average: " + average);
