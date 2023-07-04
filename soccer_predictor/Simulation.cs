@@ -9,12 +9,18 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
-        public static double HOME_ADV = 111.2;
+        public static double HOME_ADV = 101.2;
         public static double DRAW_DIST = 24.4;
-        public static double MOV_FACTOR = 1.7;
+        public static double MOV_FACTOR = 1.72;
         public static double MOV_LIMIT = 1.3;
-        public static double IMP_FACTOR = 1.2;
-        public static double RECENCY = 42.2;
+        public static double RECENCY = 42.4;
+        public static double K_WC = 1.04;
+        public static double K_WCQ = 0.96;
+        public static double K_CC = 1.08;
+        public static double K_CCQ = 0.66;
+        public static double K_CFC = 0.88;
+        public static double K_OT = 0.96;
+        public static double K_F = 0.98;
 
         public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
 
@@ -83,13 +89,22 @@ namespace soccer_predictor
             }
 
             double mi = RECENCY;
-            if (match.Event == "FIFA World Cup")
+            switch(match.Event)
             {
-                mi *= IMP_FACTOR;
-            }
-            else if (match.Event == "Friendly")
-            {
-                mi /= IMP_FACTOR;
+                case Match.MatchType.WorldCup:
+                    mi *= K_WC; break;
+                case Match.MatchType.WorldCupQual:
+                    mi *= K_WCQ; break;
+                case Match.MatchType.ContCup:
+                    mi *= K_CC; break;
+                case Match.MatchType.ContCupQual:
+                    mi *= K_CCQ; break;
+                case Match.MatchType.ConfedCup:
+                    mi *= K_CFC; break;
+                case Match.MatchType.Friendly:
+                    mi *= K_F; break;
+                case Match.MatchType.Other:
+                    mi *= K_OT; break;
             }
 
             double ratingsChange = mi * (ar - er) * af;
@@ -129,7 +144,7 @@ namespace soccer_predictor
                 }
 
                 //Run prediction if it is a world cup match
-                if (matches[i].Event == "FIFA World Cup")
+                if (matches[i].Event == Match.MatchType.WorldCup)
                 {
                     int prediction = predictor(homeTeam, awayTeam, matches[i].IsNeutral);
                     double score = 0;
@@ -196,13 +211,13 @@ namespace soccer_predictor
                 ProcessMatchResults(matches[i], homeTeam, awayTeam);
             }
 
-            Console.WriteLine(string.Format("Total Matches: {0}", counter));
+            /*Console.WriteLine(string.Format("Total Matches: {0}", counter));
             Console.WriteLine(string.Format("Correctly Predicted Win: {0}", correctWin));
             Console.WriteLine(string.Format("Correctly Predicted Draw: {0}", correctDraw));
             Console.WriteLine(string.Format("Predicted Draw Actual Win: {0}", winsCalledDraws));
             Console.WriteLine(string.Format("Predicted Win Actual Draw: {0}", drawsCalledWins));
             Console.WriteLine(string.Format("Predicted Win Actual Loss: {0}", lossesCalledWins));
-
+            */
             return sum / counter;
         }
     }
