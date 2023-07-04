@@ -160,7 +160,17 @@ namespace soccer_predictor
             double ratingsChange = mi * (ar - er) * af;
             match.EloChange = Math.Abs(ratingsChange);
             home.EloRating += ratingsChange;
+            if(home.EloRating > home.EloMax)
+            {
+                home.EloMax = home.EloRating;
+                home.EloMaxDate = match.Date;
+            }
             away.EloRating -= ratingsChange;
+            if (away.EloRating > away.EloMax)
+            {
+                away.EloMax = away.EloRating;
+                away.EloMaxDate = match.Date;
+            }
         }
 
         public static List<Team>? teams;

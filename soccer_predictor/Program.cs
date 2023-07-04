@@ -33,17 +33,17 @@ Console.WriteLine("Default Sum: " + score + "  WC: " + result[0] + "  CC:" + res
 //Simulation.TestParam("K_F", ref Simulation.K_F, 0.56, 0.76, 0.001, matches);
 
 //Printout teams by elo
-/*Simulation.teams.Sort();
+Simulation.teams.Sort();
 
 for(int i = 0; i < Simulation.teams.Count; i++)
 {
-    Console.WriteLine("" + (i+1) + ". " + Simulation.teams[i].Name + ": " + Simulation.teams[i].EloRating);
-}*/
+    Console.WriteLine("" + (i+1) + ". " + Simulation.teams[i].Name + ": " + Simulation.teams[i].EloRating + "    Max: " + Simulation.teams[i].EloMax + "   Date: " + Simulation.teams[i].EloMaxDate);
+}
 
 //Printout biggest upsets
-matches.Sort();
+/*matches.Sort();
 
 for (int i = 0; i < 20; i++)
 {
     Console.WriteLine("" + (i + 1) + ". " + matches[i].EloChange + " " + matches[i].Raw);
-}
+}*/

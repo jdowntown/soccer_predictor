@@ -9,6 +9,7 @@ namespace soccer_predictor
     internal class Match : IComparable<Match>
     {
         public string Raw;
+        public string Date;
         public string HomeTeam;
         public string AwayTeam;
         public int HomeScore;
@@ -35,6 +36,7 @@ namespace soccer_predictor
         {
             Raw = input;
             string[] fields = input.Split(',');
+            Date = fields[0];
             HomeTeam = fields[1];
             AwayTeam = fields[2];
             HomeScore = int.Parse(fields[3]);
