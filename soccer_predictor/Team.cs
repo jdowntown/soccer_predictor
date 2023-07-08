@@ -9,23 +9,31 @@ namespace soccer_predictor
     internal class Team : IComparable<Team>
     {
         public string Name;
-        public double WinRating;
-        public double EloRating;
-        public double EloMax;
-        public string EloMaxDate;
+        public double AtkElo;
+        public double DefElo;
+
 
         public Team(string name) 
         {
             Name = name;
-            WinRating = 1000;
-            EloRating = 1000;
-            EloMax = 0;
+            AtkElo = 1000;
+            DefElo = 1000;
         }
 
         public int CompareTo(Team other)
         {
-            //return -1 * EloRating.CompareTo(other.EloRating);
-            return -1 * EloMax.CompareTo(other.EloMax);
+            if(AtkElo + DefElo > other.AtkElo + other.DefElo)
+            {
+                return -1;
+            }
+            else if (AtkElo + DefElo == other.AtkElo + other.DefElo)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
         }
     }
 }

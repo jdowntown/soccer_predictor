@@ -24,32 +24,56 @@ namespace soccer_predictor
             }
         }
 
-        public static int WinRating(Team home, Team away, bool isNeutral)
+        public static double[][] GoalRating(Team home, Team away, bool isNeutral)
         {
-            return home.WinRating.CompareTo(away.WinRating);
+            double homeAtk = home.AtkElo;
+            double homeDef = home.DefElo;
+            double awayAtk = away.AtkElo;
+            double awayDef = away.DefElo;
+
+            if(!isNeutral)
+            {
+                homeAtk += Simulation.HOME_ADV;
+                homeDef += Simulation.HOME_ADV;
+            }
+
+            double[][] pred = new double[2][];
+            pred[0] = GoalPred(homeAtk, awayDef);
+            pred[1] = GoalPred(awayAtk, homeDef);
+
+            return pred;
         }
 
-        public static int EloRating(Team home, Team away, bool isNeutral)
+        public static double[] GoalPred(double atkElo, double defElo)
         {
-            double homeRating = home.EloRating;
-            double awayRating = away.EloRating;
-            if(isNeutral == false)
+            double er = 1 / (Math.Pow(10, -1 * (atkElo - defElo) / 400) + 1);
+            double expectedVal = 1.37 * (er + 0.5);
+
+            double[] retVal = new double[6];
+
+            double sum = 0.0;
+
+            //Calculate
+            for(int i = 0; i < 6; i++)
             {
-                homeRating += Simulation.HOME_ADV;
+                retVal[i] = StandardDist(expectedVal, Simulation.STDEV, i);
+                sum += retVal[i];
             }
 
-            if(homeRating > awayRating + Simulation.DRAW_DIST)
+            //Normalize
+            for (int i = 0; i < 6; i++)
             {
-                return 1;
+                retVal[i] /= sum;
             }
-            else if(homeRating + Simulation.DRAW_DIST < awayRating)
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
+
+            return retVal;
+        }
+
+        public static double StandardDist(double mean, double stdev, double val)
+        {
+            double exp = -1 * Math.Pow(val - mean, 2) / (2 * stdev * stdev);
+            double prob = Math.Pow(Math.E, exp) / (stdev * Math.Pow(2 * Math.PI, 0.5));
+            return prob;
         }
     }
 }

@@ -5,16 +5,8 @@ parser.Parse();
 
 List<Match> matches = parser.mMatches;
 
-
-/*double average = Simulation.Run(matches, Algorithms.Alphabetical);
-Console.WriteLine("Alphabetical: " + average);
-
-average = Simulation.Run(matches, Algorithms.WinRating);
-Console.WriteLine("WinRating: " + average);
-*/
-double[] result = Simulation.Run(matches, Algorithms.EloRating);
-double score = result[0] + result[1] + result[2];
-Console.WriteLine("Default Sum: " + score + "  WC: " + result[0] + "  CC:" + result[1] + "  All:" + result[2] );
+double score = Simulation.Run(matches, Algorithms.GoalRating);
+Console.WriteLine("Default Sum: " + score );
 
 //Simulation.TestParam("HOME_ADV", ref Simulation.HOME_ADV, 95, 115, 0.05, matches);
 //Simulation.TestParam("DRAW_DIST", ref Simulation.DRAW_DIST, 25, 35, 0.05, matches);
@@ -33,12 +25,12 @@ Console.WriteLine("Default Sum: " + score + "  WC: " + result[0] + "  CC:" + res
 //Simulation.TestParam("K_F", ref Simulation.K_F, 0.56, 0.76, 0.001, matches);
 
 //Printout teams by elo
-Simulation.teams.Sort();
+//Simulation.teams.Sort();
 
-for(int i = 0; i < Simulation.teams.Count; i++)
-{
-    Console.WriteLine("" + (i+1) + ". " + Simulation.teams[i].Name + ": " + Simulation.teams[i].EloRating + "    Max: " + Simulation.teams[i].EloMax + "   Date: " + Simulation.teams[i].EloMaxDate);
-}
+//for(int i = 0; i < Simulation.teams.Count; i++)
+//{
+//    Console.WriteLine("" + (i+1) + ". " + Simulation.teams[i].Name + ": " + Simulation.teams[i].AtkElo + " " + Simulation.teams[i].DefElo);
+//}
 
 //Printout biggest upsets
 /*matches.Sort();

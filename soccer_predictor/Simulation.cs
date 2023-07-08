@@ -10,14 +10,17 @@ namespace soccer_predictor
 {
     internal class Simulation
     {
-#if false
-        //Default Elo values - Default Sum: 1.9176294406632326  WC: 0.6356846473029044  CC:0.6348376880443374  All:0.6471071053159909
+        public delegate double[][] PredictorFunction(Team home, Team away, bool isNeutral);
+
+        //0	0.299	3.3444816054
+        //1	0.322	3.1055900621
+        //2	0.203	4.9261083744
+        //3	0.095	10.5263157895
+        //4	0.043	23.2558139535
+        //5	0.037	27.027027027
+        //Expected value: 1.37
+        public static double[] POINTS = { 3.3444816054, 3.1055900621, 4.9261083744, 10.5263157895, 23.2558139535, 27.027027027 };
         public static double HOME_ADV = 100;
-        public static double DRAW_DIST = 30;
-        public static double MOV_2 = 0.5;
-        public static double MOV_3 = 0.75;
-        public static double MOV_4 = 0.875;
-        public static double MOV_5 = 1.0;
         public static double RECENCY = 40;
         public static double K_WC = 1.5;
         public static double K_CC = 1.25;
@@ -27,42 +30,7 @@ namespace soccer_predictor
         public static double K_NL = 1.0;
         public static double K_OT = 0.75;
         public static double K_F = 0.50;
-#elif false
-        //rough find - Default Sum: 1.9412038978616803  WC: 0.6498962655601653  CC:0.6422011084718919  All:0.6491065238296229
-        public static double HOME_ADV = 100;
-        public static double DRAW_DIST = 30;
-        public static double MOV_2 = 0.5;
-        public static double MOV_3 = 0.75;
-        public static double MOV_4 = 1.03;
-        public static double MOV_5 = 1.0;
-        public static double RECENCY = 40;
-        public static double K_WC = 1.48;
-        public static double K_CC = 1.25;
-        public static double K_CFC = 1.25;
-        public static double K_WCQ = 1.0;
-        public static double K_CCQ = 1.0;
-        public static double K_NL = 0.98;
-        public static double K_OT = 0.86;
-        public static double K_F = 0.66;
-#else
-        //Fine tuned - Default Sum: 1.9432122254865127  WC: 0.6512448132780078  CC:0.6424650303510157  All:0.6495023818574894
-        public static double HOME_ADV = 100.50;
-        public static double DRAW_DIST = 30.25;
-        public static double MOV_2 = 0.506;
-        public static double MOV_3 = 0.734;
-        public static double MOV_4 = 1.04;
-        public static double MOV_5 = 1.033;
-        public static double RECENCY = 40.06;
-        public static double K_WC = 1.444;
-        public static double K_WCQ = 0.999;
-        public static double K_CC = 1.255;
-        public static double K_CCQ = 0.996;
-        public static double K_CFC = 1.374;
-        public static double K_NL = 0.981;
-        public static double K_OT = 0.860;
-        public static double K_F = 0.661;
-#endif
-        public delegate int PredictorFunction(Team home, Team away, bool isNeutral);
+        public static double STDEV = 1.0;
 
         public static void TestParam(string name, ref double param, double min, double max, double step, List<Match> matches)
         {
@@ -72,8 +40,7 @@ namespace soccer_predictor
             for (double val = min; val <= max; val += step)
             {
                 param = val;
-                double[] result = Simulation.Run(matches, Algorithms.EloRating);
-                double score = result[0] + result[1] + result[2];
+                double score = Simulation.Run(matches, Algorithms.GoalRating);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -89,52 +56,31 @@ namespace soccer_predictor
 
         public static void ProcessMatchResults(Match match, Team home, Team away)
         {
-            //Update win rating
-            if(match.HomeScore > match.AwayScore)
+            double homeAtk = home.AtkElo;
+            double homeDef = home.DefElo;
+            double awayAtk = away.AtkElo;
+            double awayDef = away.DefElo;
+
+            if (!match.IsNeutral)
             {
-                home.WinRating++;
-                away.WinRating--;
-            }
-            else if (match.HomeScore < match.AwayScore)
-            {
-                home.WinRating--;
-                away.WinRating++;
+                homeAtk += HOME_ADV;
+                homeDef += HOME_ADV;
             }
 
+            double homeAtkDiff = RatingsDiff(homeAtk, awayDef, match.HomeScore, match);
+            double awayAtkDiff = RatingsDiff(awayAtk, homeDef, match.AwayScore, match);
+            home.AtkElo += homeAtkDiff;
+            away.DefElo -= homeAtkDiff;
+            away.AtkElo += awayAtkDiff;
+            home.DefElo -= awayAtkDiff;
+        }
+
+        public static double RatingsDiff(double eloAtk, double eloDef, int actual, Match match)
+        {
             //Update elo rating
-            double rd = home.EloRating - away.EloRating;
-            if(match.IsNeutral == false)
-            {
-                rd += HOME_ADV;
-            }
-            double er = 1 / (Math.Pow(10, -1 * rd / 400) + 1);
-            double ar = 0.0;
-            if(match.HomeScore > match.AwayScore)
-            {
-                ar = 1.0;
-            }
-            else if(match.HomeScore == match.AwayScore)
-            {
-                ar = 0.5;
-            }
-            double mov = Math.Abs(match.HomeScore - match.AwayScore);
-            double af = 1.0;
-            if(mov == 2)
-            {
-                af += MOV_2;
-            }
-            else if(mov == 3)
-            {
-                af += MOV_3;
-            }
-            else if(mov == 4)
-            {
-                af += MOV_4;
-            }
-            else if (mov > 4)
-            {
-                af += MOV_5;
-            }
+            double[] pred = Algorithms.GoalPred(eloAtk, eloDef);
+
+            double expGoals = pred[1] + 2 * pred[2] + 3 * pred[3] + 4 * pred[4] + 5 * pred[5];
 
             double mi = RECENCY;
             switch(match.Event)
@@ -157,25 +103,15 @@ namespace soccer_predictor
                     mi *= K_OT; break;
             }
 
-            double ratingsChange = mi * (ar - er) * af;
-            match.EloChange = Math.Abs(ratingsChange);
-            home.EloRating += ratingsChange;
-            if(home.EloRating > home.EloMax)
-            {
-                home.EloMax = home.EloRating;
-                home.EloMaxDate = match.Date;
-            }
-            away.EloRating -= ratingsChange;
-            if (away.EloRating > away.EloMax)
-            {
-                away.EloMax = away.EloRating;
-                away.EloMaxDate = match.Date;
-            }
+            //Console.WriteLine(string.Format("Atk:{0:0.0} Def:{1:0.0} Exp:{2:0.00} Actual:{3}", eloAtk, eloDef, expGoals, actual));
+            //Console.WriteLine(string.Format("  Goal: 0:{0:0.000} 1:{1:0.000} 2:{2:0.000} 3:{3:0.000} 4:{4:0.000} 5+:{5:0.000}", pred[0], pred[1], pred[2], pred[3], pred[4], pred[5]));
+
+            return mi * (actual - expGoals);
         }
 
         public static List<Team>? teams;
 
-        public static double[] Run(List <Match> matches, PredictorFunction predictor)
+        public static double Run(List <Match> matches, PredictorFunction predictor)
         {
             double WCsum = 0.0;
             int WCcounter = 0;
@@ -203,79 +139,46 @@ namespace soccer_predictor
                     teams.Add(awayTeam);
                 }
 
-                    int prediction = predictor(homeTeam, awayTeam, matches[i].IsNeutral);
-                    double score = 0;
-                    string predictionText = "";
+                double[][] pred = predictor(homeTeam, awayTeam, matches[i].IsNeutral);
 
-                    if (prediction == 0)
-                    {
-                        predictionText = "Draw";
-
-                        if (matches[i].HomeScore == matches[i].AwayScore)
-                        {
-                            score = 1.0;
-                        }
-                        else
-                        {
-                            score = 0.3;
-                        }
-                    }
-                    else if (prediction > 0)
-                    {
-                        predictionText = matches[i].HomeTeam + " wins";
-                        if (matches[i].HomeScore > matches[i].AwayScore)
-                        {
-                            score = 1.0;
-                        }
-                        else if (matches[i].HomeScore == matches[i].AwayScore)
-                        {
-                            score = 0.3;
-                        }
-                        else
-                        {
-                            score = 0;
-                        }
-                    }
-                    else
-                    {
-                        predictionText = matches[i].AwayTeam + " wins";
-                        if (matches[i].HomeScore < matches[i].AwayScore)
-                        {
-                            score = 1.0;
-                        }
-                        else if (matches[i].HomeScore == matches[i].AwayScore)
-                        {
-                            score = 0.3;
-                        }
-                        else
-                        {
-                            score = 0;
-                        }
-                    }
-                //Console.WriteLine(string.Format("{0} - {1} - {2} - {3} {4}", score, prediction, matches[i].Raw, homeTeam.EloRating, awayTeam.EloRating));
+                //Console.WriteLine("Match: " + matches[i].Raw);
+                //Console.WriteLine(string.Format("  Home: 0:{0:0.000} 1:{1:0.000} 2:{2:0.000} 3:{3:0.000} 4:{4:0.000} 5+:{5:0.000}", pred[0][0], pred[0][1], pred[0][2], pred[0][3], pred[0][4], pred[0][5]));
+                //Console.WriteLine(string.Format("  Away: 0:{0:0.000} 1:{1:0.000} 2:{2:0.000} 3:{3:0.000} 4:{4:0.000} 5+:{5:0.000}", pred[1][0], pred[1][1], pred[1][2], pred[1][3], pred[1][4], pred[1][5]));
+                int homeScore = matches[i].HomeScore;
+                if(homeScore > 5)
+                {
+                    homeScore = 5;
+                }
+                int awayScore = matches[i].AwayScore;
+                if (awayScore > 5)
+                {
+                    awayScore = 5;
+                }
 
                 if (matches[i].Event == Match.MatchType.WorldCup)
                 {
-                    WCsum += score;
+                    WCsum += pred[0][homeScore] * POINTS[homeScore];
+                    WCsum += pred[1][awayScore] * POINTS[awayScore];
                     WCcounter++;
                 }
                 if (matches[i].Event == Match.MatchType.WorldCup || matches[i].Event == Match.MatchType.ContCup)
                 {
-                    CCsum += score;
+                    CCsum += pred[0][homeScore] * POINTS[homeScore];
+                    CCsum += pred[1][awayScore] * POINTS[awayScore];
                     CCcounter++;
                 }
-                Allsum += score;
+                Allsum += pred[0][homeScore] * POINTS[homeScore];
+                Allsum += pred[1][awayScore] * POINTS[awayScore];
                 Allcounter++;
-
 
                 ProcessMatchResults(matches[i], homeTeam, awayTeam);
             }
 
-            double[] result = new double[3];
-            result[0] = WCsum / WCcounter;
-            result[1] = CCsum / CCcounter;
-            result[2] = Allsum / Allcounter;
+            double WCval = WCsum / 2.0 / WCcounter;
+            double CCval = CCsum / 2.0 / CCcounter;
+            double Allval = Allsum / 2.0 / Allcounter;
 
+            double result = (WCval + CCval + Allval) / 3;
             return result;
         }
     }

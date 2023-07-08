@@ -90,12 +90,6 @@ namespace soccer_predictor
             }
             else
             {
-                /*string? found = Others.Find(x => x == ev);
-                if(found == null)
-                {
-                    Others.Add(ev);
-                    Console.WriteLine(ev);
-                }*/
                 Event = MatchType.Other;
             }
         }
