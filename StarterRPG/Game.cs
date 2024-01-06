@@ -11,6 +11,9 @@ namespace StarterRPG
     internal class Game
     {
         string mName;
+        int mPlayerX = 0;
+        int mPlayerY = 0;
+
         bool mQuit = false;
         private enum State
         {
@@ -43,7 +46,17 @@ namespace StarterRPG
 
         private void MapDraw()
         {
-
+            Console.WriteLine("-------");
+            for(int i = 0; i < 5; i++) 
+            {
+                StringBuilder line = new StringBuilder("|     |");
+                if(i == mPlayerY)
+                {
+                    line[1+mPlayerX] = '☺';
+                }
+                Console.WriteLine(line);
+            }
+            Console.WriteLine("-------");
         }
 
         private void MapInput()
@@ -57,8 +70,36 @@ namespace StarterRPG
                 case ConsoleKey.Escape:
                     mQuit = true;
                     break;
-                
-                
+
+                case ConsoleKey.W:
+                    mPlayerY--;
+                    break;
+                case ConsoleKey.A:
+                    mPlayerX--;
+                    break;
+                case ConsoleKey.S:
+                    mPlayerY++;
+                    break;
+                case ConsoleKey.D:
+                    mPlayerX++;
+                    break;
+            }
+
+            if(mPlayerX < 0)
+            {
+                mPlayerX = 0;
+            }
+            if(mPlayerX > 4)
+            {
+                mPlayerX = 4;
+            }
+            if (mPlayerY < 0)
+            {
+                mPlayerY = 0;
+            }
+            if (mPlayerY > 4)
+            {
+                mPlayerY = 4;
             }
         }
     }
