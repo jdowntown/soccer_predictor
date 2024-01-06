@@ -68,6 +68,7 @@ namespace StarterRPG
 
         private void MapDraw()
         {
+            Console.BackgroundColor = ConsoleColor.Red;
             Console.WriteLine("-------");
             for(int i = 0; i < 5; i++) 
             {
@@ -83,6 +84,7 @@ namespace StarterRPG
                 Console.WriteLine(line);
             }
             Console.WriteLine("-------");
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine("You have " + mGold + " gold.");
         }
 
